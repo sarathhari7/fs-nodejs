@@ -1,4 +1,4 @@
 {
-    "MONGO_URI":"your_mongodb_connection_string",
+    "MONGO_URI":"mongodb+srv://sarathhariinfo:eGiT4XvXaVkGTY7x@dbcluster.spo3w.mongodb.net/?retryWrites=true&w=majority&appName=DBCluster",
     "JWT_SECRET":"your_jwt_secret"
 }

@@ -1,55 +1,30 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const bodyParser = require('body-parser');
+
 const router = express.Router();
+const secretKey = 'your_secret_key';
 
-// Register a new user
-router.post('/register', async (req, res) => {
+router.use(bodyParser.json());
+
+router.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Create a new user
-    const user = new User({ username, password });
-    await user.save();
-
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Login a user
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    // Check if the user exists
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Compare the password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate a JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+  // For demonstration purposes, we'll use a hardcoded username and password.
+  // In a real application, you should validate the username and password against your database.
+  if (username === 'admin' && password === 'password') {
+    const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+    res.json({
+      success: true,
+      token: token,
+      user: {
+        id: 1,
+        name: 'John Doe',
+        email: 'john.doe@example.com'
+      }
     });
-
-    res.status(200).json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
