@@ -1,18 +1,29 @@
 const express = require('express');
+const connectDB = require('./config/db');
+const bodyParser = require('body-parser');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const app = express();
-const authRoutes = require('./routes/auth');
-const secretKey = 'your_secret_key'; // Replace with your actual secret key
 
-app.use(cors());
-app.use(express.json());
-app.use('/auth', authRoutes);
+const app = express(); // Initialize the app
 
-app.get('/data', validateToken, (req, res) => {
-  res.json({ message: 'This is protected data' });
+// Middleware
+app.use(bodyParser.json());
+app.use(cors()); // Enable CORS
+
+// Error handling middleware for JSON parsing errors
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ msg: 'Invalid JSON' });
+  }
+  next();
 });
 
+// Connect to MongoDB
+connectDB();
+
+// Use routes
+// Use routes
+app.use('/login', require('./routes/login'));
+app.use('/profile', require('./routes/profile')); // Add this line
 // Listen on a port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
